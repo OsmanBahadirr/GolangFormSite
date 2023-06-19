@@ -11,6 +11,9 @@ var mux *http.ServeMux
 
 func initHandlers() {
 	mux.HandleFunc("/api/form/listall", site.ListAllFormsHandler)
+	mux.HandleFunc("/api/form/show", site.ShowFormHandler)
+	mux.HandleFunc("/api/answer/create", site.CreateAnswersHandler)
+	mux.HandleFunc("/api/answer/listbysubmitid", site.ListAnswersBySubmitIdHandler)
 }
 
 func Start() {
