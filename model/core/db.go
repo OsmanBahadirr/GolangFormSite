@@ -1,4 +1,4 @@
-package model
+package core
 
 import (
 	"database/sql"
@@ -9,7 +9,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var db *sql.DB
+var DB *sql.DB
 
 type connection struct {
 	Host     string
@@ -22,7 +22,7 @@ type connection struct {
 func Init() *sql.DB {
 	if err := godotenv.Load("config/.env"); err != nil {
 		fmt.Printf("Error while loading env file: %s\n", err.Error())
-		return db
+		return DB
 	}
 
 	connInfo := connection{
@@ -42,7 +42,7 @@ func Init() *sql.DB {
 		connInfo.DBName,
 	)
 	var err error
-	db, err = sql.Open("postgres", connString)
+	DB, err = sql.Open("postgres", connString)
 
 	if err != nil {
 		fmt.Printf("Error connecting to the database: %s\n", err.Error())
@@ -50,13 +50,13 @@ func Init() *sql.DB {
 		fmt.Println("Databse is opened")
 	}
 
-	err = db.Ping()
+	err = DB.Ping()
 
 	if err != nil {
 		fmt.Printf("Error: Couldnot ping database: %s\n", err.Error())
-		return db
+		return DB
 	} else {
 		fmt.Println("Database pinged successfully")
 	}
-	return db
+	return DB
 }

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"GolangForm/model/core"
 	"fmt"
 )
 
@@ -13,7 +14,7 @@ func ListAllForms() ([]Form, error) {
 	var forms []Form
 
 	query := `select id, title from forms`
-	rows, err := db.Query(query)
+	rows, err := core.DB.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +44,7 @@ func ShowForm(inputFormId string) ([]Question, error) {
 	var questions []Question
 
 	query := fmt.Sprintf(`select id,form_id,text from questions where form_id = %s`, inputFormId)
-	rows, err := db.Query(query)
+	rows, err := core.DB.Query(query)
 	if err != nil {
 		return nil, err
 	}

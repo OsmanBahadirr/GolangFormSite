@@ -2,10 +2,10 @@ package main
 
 import (
 	"GolangForm/controller"
-	"GolangForm/model"
+	"GolangForm/model/core"
 )
 
 func main() {
-	model.Init()
+	core.Init()
 	controller.Start()
 }

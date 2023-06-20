@@ -1,5 +1,7 @@
 package model
 
+import "GolangForm/model/core"
+
 type Answer struct {
 	Id         int    `json:"id"`
 	SubmitId   int    `json:"submitId"`
@@ -12,7 +14,7 @@ func CreateAnswer(answer Answer, inputSubmitId int, inputQuestionNo int) error {
 
 	//query := fmt.Sprintf(`insert into answers(submit_id,question_id,text) values (%s,%d,%s);`, inputSubmitId, answer.QuestionId, answer.Text)
 	query := `insert into answers(submit_id,question_id,text,question_no) values ($1,$2,$3,$4);`
-	_, err := db.Exec(query, inputSubmitId, answer.QuestionId, answer.Text, inputQuestionNo)
+	_, err := core.DB.Exec(query, inputSubmitId, answer.QuestionId, answer.Text, inputQuestionNo)
 
 	if err != nil {
 		return err
@@ -25,7 +27,7 @@ func ListAnswersBySubmitId(inputSubmitId int) ([]Answer, error) {
 
 	query := "select id,submit_id,question_id,text,question_no from answers where submit_id = $1;"
 
-	rows, err := db.Query(query, inputSubmitId)
+	rows, err := core.DB.Query(query, inputSubmitId)
 	if err != nil {
 		return nil, err
 	}

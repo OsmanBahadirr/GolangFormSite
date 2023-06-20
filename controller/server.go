@@ -9,10 +9,16 @@ import (
 
 var mux *http.ServeMux
 
+const (
+	roleAdmin  = "admin"
+	roleMod    = "mod"
+	rolePublic = "public"
+)
+
 func initHandlers() {
-	mux.HandleFunc("/api/form/listall", site.ListAllFormsHandler)
-	mux.HandleFunc("/api/form/show", site.ShowFormHandler)
-	mux.HandleFunc("/api/answer/create", site.CreateAnswersHandler)
+	mux.HandleFunc("/api/form/listall", (site.ListAllFormsHandler))
+	mux.HandleFunc("/api/form/show", (site.ShowFormHandler))
+	mux.HandleFunc("/api/answer/create", (site.CreateAnswersHandler))
 	mux.HandleFunc("/api/answer/listbysubmitid", site.ListAnswersBySubmitIdHandler)
 }
 
