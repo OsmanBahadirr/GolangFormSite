@@ -2,9 +2,11 @@ package controller
 
 import (
 	"GolangForm/controller/site"
+	"GolangForm/model/core"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
 
 var mux *http.ServeMux
@@ -16,18 +18,20 @@ const (
 )
 
 func initHandlers() {
-	mux.HandleFunc("/api/form/listall", (site.ListAllFormsHandler))
-	mux.HandleFunc("/api/form/show", (site.ShowFormHandler))
-	mux.HandleFunc("/api/answer/create", (site.CreateAnswersHandler))
-	mux.HandleFunc("/api/answer/listbysubmitid", site.ListAnswersBySubmitIdHandler)
+	mux.HandleFunc("/getjwt", core.GetJWT)
+	mux.HandleFunc("/api/form/listall", site.ListAllFormsHandler)
+	mux.HandleFunc("/api/form/show", site.ShowFormHandler)
+	mux.Handle("/api/answer/create", core.ValidateJWT([]string{os.Getenv("ADMIN")}, site.CreateAnswersHandler))
+	mux.Handle("/api/answer/listbysubmitid", core.ValidateJWT([]string{os.Getenv("ADMIN")}, site.ListAnswersBySubmitIdHandler))
+
 }
 
 func Start() {
 	mux = http.NewServeMux()
 
 	initHandlers()
-	fmt.Printf("Mux initialized and listening on server :8080\n")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	fmt.Printf("Mux initialized and listening on server :4000\n")
+	if err := http.ListenAndServe(":4000", mux); err != nil {
 		log.Fatal(err)
 	}
 }
