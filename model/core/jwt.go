@@ -20,7 +20,7 @@ var APIKEY = "12345"
 	SECRET = []byte(os.Getenv("SECRET_KEY"))
 }*/
 
-func createJWT(role string) (string, error) {
+func CreateJWT(role string) (string, error) {
 
 	token := jwt.New(jwt.SigningMethodHS256)
 
@@ -38,7 +38,7 @@ func createJWT(role string) (string, error) {
 	return tokenStr, nil
 }
 
-func ValidateJWT(roles []string, handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
+func ValidateJwtOnHandler(roles []string, handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header["Token"] != nil {
@@ -71,6 +71,31 @@ func ValidateJWT(roles []string, handler func(w http.ResponseWriter, r *http.Req
 	})
 }
 
+func ValidateJWT(roles []string, inputToken string) bool {
+
+	type Claims struct {
+		Roles []string `json:"roles"`
+		jwt.StandardClaims
+	}
+
+	token, err := jwt.ParseWithClaims(inputToken, &Claims{}, func(t *jwt.Token) (interface{}, error) {
+		return SECRET, nil
+	})
+	if err != nil {
+		return false
+	}
+
+	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
+
+		for _, role := range roles {
+			if claims.Roles[0] == role {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func GetJWT(w http.ResponseWriter, r *http.Request) {
 
 	if r.Header["Role"] != nil {
@@ -79,7 +104,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprint(w, "APIKEY")
 				return
 			} else {
-				token, err := createJWT(r.Header["Role"][0])
+				token, err := CreateJWT(r.Header["Role"][0])
 				if err != nil {
 					return
 				}

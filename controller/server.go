@@ -21,8 +21,8 @@ func initHandlers() {
 	mux.HandleFunc("/getjwt", core.GetJWT)
 	mux.HandleFunc("/api/form/listall", site.ListAllFormsHandler)
 	mux.HandleFunc("/api/form/show", site.ShowFormHandler)
-	mux.Handle("/api/answer/create", core.ValidateJWT([]string{os.Getenv("ADMIN")}, site.CreateAnswersHandler))
-	mux.Handle("/api/answer/listbysubmitid", core.ValidateJWT([]string{os.Getenv("ADMIN")}, site.ListAnswersBySubmitIdHandler))
+	mux.Handle("/api/answer/create", core.ValidateJwtOnHandler([]string{os.Getenv("ADMIN")}, site.CreateAnswersHandler))
+	mux.Handle("/api/answer/listbysubmitid", core.ValidateJwtOnHandler([]string{os.Getenv("ADMIN")}, site.ListAnswersBySubmitIdHandler))
 
 }
 
