@@ -7,30 +7,41 @@ import (
 )
 
 type User struct {
-	Id       int
-	UserName string
-	Password string
-	Role     string
-	Token    string
+	Id       int    `json:"id"`
+	UserName string `json:"userName"`
+	Password string `json:"password"`
+	Role     string `json:"role"`
+	Token    string `json:"token"`
 }
 
-func CreateAcount(user User) {
+func CreateAcount(user User) bool {
 	query := `insert into users(user_name,password,role,token) values($1,$2,$3,$4)`
 
 	userToken, err := core.CreateJWT(user.Role)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Print(err.Error())
+		return false
 	}
-	core.DB.Exec(query, user.UserName, user.Password, user.Role, userToken)
-}
 
-func Login(inputUser User) (bool, error) {
-	query := fmt.Sprintf(`select user_name,password,role from users where id = %v`, inputUser.Id)
-
-	rows, err := core.DB.Query(query)
+	_, err = core.DB.Exec(query, user.UserName, user.Password, user.Role, userToken)
 
 	if err != nil {
-		return false, err
+		log.Fatal(err)
+	}
+
+	return true
+}
+
+func Login(inputUser User) (bool, User) {
+
+	query := `select user_name,password,role from users where user_name = $1`
+
+	var user User
+	rows, err := core.DB.Query(query, inputUser.UserName)
+
+	if err != nil {
+		fmt.Println()
+		return false, user
 	}
 
 	for rows.Next() {
@@ -40,11 +51,12 @@ func Login(inputUser User) (bool, error) {
 		var role string
 		var token string
 
-		err := rows.Scan(&id, &userName, &password, &role, &token)
+		err := rows.Scan(&userName, &password, &role)
 		if err != nil {
-			return false, err
+			fmt.Println(err)
+			return false, user
 		}
-		user := User{
+		user = User{
 			Id:       id,
 			UserName: userName,
 			Password: password,
@@ -52,11 +64,17 @@ func Login(inputUser User) (bool, error) {
 			Token:    token,
 		}
 		if inputUser.Password == user.Password && inputUser.UserName == user.UserName {
-			return true, nil
+			user.Token, err = core.CreateJWT(user.Role)
+			if err != nil {
+				fmt.Println(err)
+				return false, user
+
+			}
+			return true, user
 		}
 
 	}
-	return false, nil
+	return false, user
 }
 
 //token sistemini entegre et
