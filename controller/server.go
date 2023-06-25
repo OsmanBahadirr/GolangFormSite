@@ -25,6 +25,7 @@ func initHandlers() {
 	mux.HandleFunc("/api/user/login", site.LoginHandler)
 	mux.Handle("/api/answer/create", core.ValidateJwtOnHandler([]string{os.Getenv("ADMIN")}, site.CreateAnswersHandler))
 	mux.Handle("/api/answer/listbysubmitid", core.ValidateJwtOnHandler([]string{os.Getenv("ADMIN")}, site.ListAnswersBySubmitIdHandler))
+	mux.Handle("api/answer/updatequestion", core.ValidateJwtOnHandler([]string{"admin"}, site.UpdateQuestionHandler))
 
 }
 
